@@ -1,6 +1,8 @@
 import type {
+  CreateEventInput,
   CreateObjectInput,
   HealthResponse,
+  OrybitEvent,
   OrybitObject,
   UpdateObjectInput
 } from "./types";
@@ -110,6 +112,41 @@ export class OrybitApi {
         )}`,
         {
           method: "PATCH",
+          body: JSON.stringify(input)
+        }
+      );
+
+    return response.data;
+  }
+
+  async listObjectEvents(
+    identifier: string
+  ): Promise<OrybitEvent[]> {
+    const response =
+      await this.request<
+        ApiListEnvelope<OrybitEvent>
+      >(
+        `/v1/objects/${encodeURIComponent(
+          identifier
+        )}/events`
+      );
+
+    return response.data;
+  }
+
+  async createObjectEvent(
+    identifier: string,
+    input: CreateEventInput
+  ): Promise<OrybitEvent> {
+    const response =
+      await this.request<
+        ApiEnvelope<OrybitEvent>
+      >(
+        `/v1/objects/${encodeURIComponent(
+          identifier
+        )}/events`,
+        {
+          method: "POST",
           body: JSON.stringify(input)
         }
       );

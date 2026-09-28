@@ -1,7 +1,9 @@
 import type {
+  EventActor,
   LifecycleStatus,
   ObjectCarrier,
   ObjectIdentity,
+  OrybitEvent,
   OrybitObject
 } from "@orybit/protocol";
 
@@ -25,6 +27,13 @@ export interface UpdateObjectInput {
   metadata?: Record<string, unknown>;
 }
 
+export interface CreateEventInput {
+  type: string;
+  occurredAt?: string;
+  actor?: EventActor;
+  data?: Record<string, unknown>;
+}
+
 export interface ObjectRepository {
   create(object: OrybitObject): Promise<OrybitObject>;
   list(): Promise<OrybitObject[]>;
@@ -35,6 +44,13 @@ export interface ObjectRepository {
     id: string,
     object: OrybitObject
   ): Promise<OrybitObject | null>;
+}
+
+export interface EventRepository {
+  append(event: OrybitEvent): Promise<OrybitEvent>;
+  listForObject(
+    objectId: string
+  ): Promise<OrybitEvent[]>;
 }
 
 export interface D1ResultLike<T = unknown> {
