@@ -16,12 +16,18 @@
     "build:api": "npm run build --workspace @orybit/api",
     "test:api": "npm run test --workspace @orybit/api",
     "check:api": "npm run build:protocol && npm run build:api && npm run test:api",
-    "check": "npm run check:foundation && npm run check:protocol && npm run check:api"
+    "check": "npm run check:foundation && npm run check:protocol && npm run check:api",
+    "cf:whoami": "npx wrangler@4 whoami",
+    "cf:d1:create": "npx wrangler@4 d1 create orybit-registry --binding DB --update-config --config wrangler.jsonc",
+    "cf:d1:migrate:local": "npx wrangler@4 d1 migrations apply orybit-registry --local --config wrangler.jsonc",
+    "cf:d1:migrate:remote": "npx wrangler@4 d1 migrations apply orybit-registry --remote --config wrangler.jsonc",
+    "cf:dev": "npx wrangler@4 dev --config wrangler.jsonc",
+    "cf:deploy": "npx wrangler@4 deploy --config wrangler.jsonc"
   },
   "devDependencies": {
     "typescript": "^5.9.2"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }
