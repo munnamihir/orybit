@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orybit.dev/specs/v0.1/capability.schema.json",
+  "title": "ORYBIT Capability",
+  "description": "Describes an ability exposed by an ORYBIT object.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "name",
+    "title",
+    "description",
+    "access"
+  ],
+  "properties": {
+    "protocolVersion": {
+      "const": "0.1"
+    },
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)+$",
+      "examples": [
+        "manual.view",
+        "maintenance.record",
+        "warranty.view",
+        "ownership.transfer"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1
+    },
+    "access": {
+      "type": "string",
+      "enum": [
+        "public",
+        "owner",
+        "authorized"
+      ]
+    },
+    "requiresApproval": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

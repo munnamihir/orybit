@@ -1,0 +1,15 @@
+[
+  {
+    "protocolVersion": "0.1",
+    "id": "evt_demo_created_001",
+    "objectId": "obj_demo_coffee_001",
+    "type": "object.created",
+    "occurredAt": "2026-09-28T00:00:00Z",
+    "actor": {
+      "type": "system"
+    },
+    "data": {
+      "source": "ORYBIT reference example"
+    }
+  }
+]

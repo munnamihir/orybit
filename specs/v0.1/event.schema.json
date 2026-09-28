@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orybit.dev/specs/v0.1/event.schema.json",
+  "title": "ORYBIT Object Event",
+  "description": "Represents something that occurred during the lifecycle of a physical object.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocolVersion",
+    "id",
+    "objectId",
+    "type",
+    "occurredAt",
+    "actor",
+    "data"
+  ],
+  "properties": {
+    "protocolVersion": {
+      "const": "0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^evt_[A-Za-z0-9_-]+$"
+    },
+    "objectId": {
+      "type": "string",
+      "pattern": "^obj_[A-Za-z0-9_-]+$"
+    },
+    "type": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(\\.[a-z][a-z0-9]*)*$",
+      "examples": [
+        "object.created",
+        "maintenance.completed",
+        "part.replaced",
+        "object.retired"
+      ]
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "system",
+            "user",
+            "manufacturer",
+            "service-provider",
+            "device"
+          ]
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

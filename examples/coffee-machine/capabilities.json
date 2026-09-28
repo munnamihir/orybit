@@ -1,0 +1,26 @@
+[
+  {
+    "protocolVersion": "0.1",
+    "name": "manual.view",
+    "title": "View Manual",
+    "description": "View documentation associated with this object.",
+    "access": "public",
+    "requiresApproval": false
+  },
+  {
+    "protocolVersion": "0.1",
+    "name": "maintenance.record",
+    "title": "Record Maintenance",
+    "description": "Add a maintenance event to this object's lifecycle.",
+    "access": "owner",
+    "requiresApproval": true
+  },
+  {
+    "protocolVersion": "0.1",
+    "name": "warranty.view",
+    "title": "View Warranty",
+    "description": "View warranty information associated with this object.",
+    "access": "owner",
+    "requiresApproval": false
+  }
+]

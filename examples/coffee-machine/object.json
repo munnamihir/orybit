@@ -1,0 +1,32 @@
+{
+  "protocolVersion": "0.1",
+  "id": "obj_demo_coffee_001",
+  "publicId": "coffee-demo-001",
+  "kind": "appliance",
+  "identity": {
+    "name": "ORYBIT Demo Coffee Machine",
+    "manufacturer": "Demo Appliances",
+    "model": "C100",
+    "serial": "C100-000001",
+    "description": "Reference appliance used to demonstrate the ORYBIT physical object model."
+  },
+  "lifecycle": {
+    "status": "active",
+    "createdAt": "2026-09-28T00:00:00Z",
+    "updatedAt": "2026-09-28T00:00:00Z"
+  },
+  "carriers": [
+    {
+      "type": "qr",
+      "uri": "https://orybit.dev/o/coffee-demo-001"
+    }
+  ],
+  "capabilities": [
+    "manual.view",
+    "maintenance.record",
+    "warranty.view"
+  ],
+  "metadata": {
+    "demo": true
+  }
+}

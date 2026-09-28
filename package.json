@@ -1,0 +1,24 @@
+{
+  "name": "orybit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The software layer for physical objects.",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "workers/*"
+  ],
+  "scripts": {
+    "build:protocol": "tsc -p packages/protocol/tsconfig.json",
+    "test:protocol": "node --test packages/protocol/test/*.test.mjs",
+    "check:foundation": "node scripts/check-foundation.mjs",
+    "check:protocol": "npm run build:protocol && npm run test:protocol",
+    "check": "npm run check:foundation && npm run check:protocol"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
