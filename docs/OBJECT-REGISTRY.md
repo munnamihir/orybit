@@ -1,6 +1,6 @@
 # ORYBIT Object Registry
 
-Status: Phase 1 / Step 004
+Status: Phase 1 / Steps 004-005
 
 ## Purpose
 
@@ -22,10 +22,21 @@ It provides a canonical place to:
 GET /health
 ```
 
+The health endpoint is public.
+
+All `/v1/objects` routes are protected during the prototype runtime phase and require:
+
+```http
+Authorization: Bearer <ORYBIT_ADMIN_TOKEN>
+```
+
+If the Worker secret is missing, the registry fails closed.
+
 ### Create Object
 
 ```http
 POST /v1/objects
+Authorization: Bearer <ORYBIT_ADMIN_TOKEN>
 Content-Type: application/json
 ```
 
@@ -57,6 +68,7 @@ ORYBIT generates:
 
 ```http
 GET /v1/objects
+Authorization: Bearer <ORYBIT_ADMIN_TOKEN>
 ```
 
 ### Get Object
@@ -68,10 +80,13 @@ GET /v1/objects/{internalId}
 GET /v1/objects/{publicId}
 ```
 
+These routes are admin-protected until a later phase defines a privacy-safe public object projection.
+
 ### Update Object
 
 ```http
 PATCH /v1/objects/{internalId-or-publicId}
+Authorization: Bearer <ORYBIT_ADMIN_TOKEN>
 Content-Type: application/json
 ```
 
@@ -111,15 +126,18 @@ Included:
 - protocol validation
 - D1 migration
 - automated tests
+- prototype admin bearer-token protection
+- Cloudflare Worker runtime configuration
 
 Not yet included:
 
-- authentication
+- end-user authentication
 - ownership
 - lifecycle event persistence
 - delete
-- permissions
+- scoped permissions
 - QR generation
+- privacy-safe public object projection
 - public object UI
 
-Those are intentionally deferred to later roadmap stages.
+The admin token is a temporary prototype boundary. It does not replace the future ownership and PermissionOS architecture.
