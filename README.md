@@ -136,27 +136,36 @@ Run:
 npm run check
 ```
 
-A successful result ends with:
-
-```text
-ORYBIT foundation check PASSED.
-
-Physical object model -> READY
-Next milestone -> Object Registry
-```
+A successful Phase 1 check runs the foundation checks, protocol build/tests, API build, and registry tests.
 
 ## Current Status
 
-Phase 0 — Foundation
+**Phase 1 — Object Registry**
 
-Protocol version: 0.1
+Protocol version: **0.1**
 
-Immediate objective:
+Current backend capabilities:
+
+```text
+POST  /v1/objects
+GET   /v1/objects
+GET   /v1/objects/:identifier
+PATCH /v1/objects/:identifier
+GET   /health
+```
+
+The registry uses `@orybit/protocol` for object validation and supports both an in-memory repository for tests and a Cloudflare D1 persistence adapter.
+
+See [`docs/OBJECT-REGISTRY.md`](docs/OBJECT-REGISTRY.md).
+
+## Immediate Direction
 
 ```text
 Physical Object
       ↓
 Persistent Digital Identity
+      ↓
+Object Registry
       ↓
 QR / NFC Resolution
       ↓

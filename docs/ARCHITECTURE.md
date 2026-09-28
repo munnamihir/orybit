@@ -81,3 +81,28 @@ Architecture documents, roadmap, threat model, and ADRs.
 ## Architecture Rule
 
 No new infrastructure component should be introduced without a documented problem that requires it.
+
+## Phase 1 Object Registry
+
+```text
+                       Request
+                          |
+                          v
+                     HTTP Router
+                          |
+                          v
+                  Object Factories
+                          |
+                          v
+                 ObjectRepository
+                    /          \
+                   v            v
+        Memory Repository    D1 Repository
+             |                   |
+             v                   v
+           Tests          Cloudflare D1
+```
+
+The API uses the shared `@orybit/protocol` package for identifiers, protocol versioning, and validation.
+
+The repository abstraction prevents HTTP and domain logic from depending directly on D1.

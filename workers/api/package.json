@@ -1,0 +1,16 @@
+{
+  "name": "@orybit/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ORYBIT Object Registry API.",
+  "type": "module",
+  "main": "./dist/worker.js",
+  "types": "./dist/worker.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@orybit/protocol": "0.1.0"
+  }
+}
