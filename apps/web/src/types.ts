@@ -1,12 +1,15 @@
 import type {
+  EventActor,
   LifecycleStatus,
   ObjectCarrier,
   ObjectIdentity,
+  OrybitEvent,
   OrybitObject
 } from "@orybit/protocol";
 
 export type {
   LifecycleStatus,
+  OrybitEvent,
   OrybitObject
 };
 
@@ -34,6 +37,13 @@ export interface UpdateObjectInput {
   carriers?: ObjectCarrier[];
   capabilities?: string[];
   metadata?: Record<string, unknown>;
+}
+
+export interface CreateEventInput {
+  type: string;
+  occurredAt?: string;
+  actor?: EventActor;
+  data?: Record<string, unknown>;
 }
 
 export interface DashboardSummary {
