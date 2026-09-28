@@ -21,8 +21,8 @@
     "cf:d1:create": "npx wrangler@4 d1 create orybit-registry --binding DB --update-config --config wrangler.jsonc",
     "cf:d1:migrate:local": "npx wrangler@4 d1 migrations apply orybit-registry --local --config wrangler.jsonc",
     "cf:d1:migrate:remote": "npx wrangler@4 d1 migrations apply orybit-registry --remote --config wrangler.jsonc",
-    "cf:dev": "npx wrangler@4 dev --config wrangler.jsonc",
-    "cf:deploy": "npx wrangler@4 deploy --config wrangler.jsonc"
+    "cf:dev": "npm run build:protocol && npx wrangler@4 dev --config wrangler.jsonc",
+    "cf:deploy": "npm run build:protocol && npx wrangler@4 deploy --config wrangler.jsonc"
   },
   "devDependencies": {
     "typescript": "^5.9.2"
