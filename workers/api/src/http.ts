@@ -7,6 +7,10 @@ import {
   buildNewObject
 } from "./object-factory.js";
 
+import {
+  toPublicObjectProfile
+} from "./public-object.js";
+
 import type {
   CreateObjectInput,
   ObjectRepository,
@@ -181,6 +185,19 @@ function routeIdentifier(
     : null;
 }
 
+function publicRouteIdentifier(
+  pathname: string
+): string | null {
+  const match =
+    pathname.match(
+      /^\/public\/objects\/([^/]+)$/
+    );
+
+  return match
+    ? decodeURIComponent(match[1])
+    : null;
+}
+
 export async function handleRequest(
   request: Request,
   repository: ObjectRepository,
@@ -197,6 +214,37 @@ export async function handleRequest(
       service: "orybit-object-registry",
       protocolVersion:
         ORYBIT_PROTOCOL_VERSION
+    });
+  }
+
+  const publicIdentifier =
+    publicRouteIdentifier(url.pathname);
+
+  if (
+    request.method === "GET" &&
+    publicIdentifier
+  ) {
+    const object =
+      await repository.findByIdentifier(
+        publicIdentifier
+      );
+
+    if (
+      !object ||
+      object.publicId !== publicIdentifier
+    ) {
+      return error(
+        404,
+        {
+          code: "PUBLIC_OBJECT_NOT_FOUND",
+          message:
+            "The requested public ORYBIT profile was not found."
+        }
+      );
+    }
+
+    return json({
+      data: toPublicObjectProfile(object)
     });
   }
 
