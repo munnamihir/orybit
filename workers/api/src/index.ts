@@ -7,6 +7,10 @@ export {
 } from "./d1-repository.js";
 
 export {
+  D1OwnershipRepository
+} from "./d1-ownership-repository.js";
+
+export {
   buildNewEvent
 } from "./event-factory.js";
 
@@ -23,16 +27,37 @@ export {
 } from "./memory-repository.js";
 
 export {
+  MemoryOwnershipRepository
+} from "./memory-ownership-repository.js";
+
+export {
   applyObjectPatch,
   buildNewObject
 } from "./object-factory.js";
 
+export {
+  acceptTransferToken,
+  buildOwner,
+  createTransferSecret,
+  resolveTransferToken
+} from "./ownership-service.js";
+
 export type {
+  AssignOwnershipInput,
   CreateEventInput,
   CreateObjectInput,
+  CreateOwnerInput,
+  CreateOwnershipTransferInput,
   D1DatabaseLike,
   Env,
   EventRepository,
   ObjectRepository,
+  OrybitOwner,
+  OwnershipRecord,
+  OwnershipRepository,
+  OwnershipSnapshot,
+  OwnershipTransfer,
+  OwnershipTransferSecret,
+  OwnerType,
   UpdateObjectInput
 } from "./types.js";

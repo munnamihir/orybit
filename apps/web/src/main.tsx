@@ -8,6 +8,10 @@ import {
 import App from "./App";
 import ObjectMemoryConsole
   from "./ObjectMemoryConsole";
+import OwnershipAcceptancePage
+  from "./OwnershipAcceptancePage";
+import OwnershipConsole
+  from "./OwnershipConsole";
 import PhysicalBridgeLauncher
   from "./PhysicalBridgeLauncher";
 import PublicObjectPage
@@ -15,6 +19,7 @@ import PublicObjectPage
 import "./styles.css";
 import "./physical-object.css";
 import "./object-memory.css";
+import "./ownership.css";
 
 const root =
   document.getElementById("root");
@@ -30,21 +35,29 @@ const publicMatch =
     /^\/o\/([^/]+)\/?$/
   );
 
-const content = publicMatch
-  ? (
-      <PublicObjectPage
-        publicId={decodeURIComponent(
-          publicMatch[1]
-        )}
-      />
-    )
-  : (
-      <>
-        <App />
-        <ObjectMemoryConsole />
-        <PhysicalBridgeLauncher />
-      </>
-    );
+const isOwnershipAcceptance =
+  /^\/ownership\/accept\/?$/.test(
+    window.location.pathname
+  );
+
+const content = isOwnershipAcceptance
+  ? <OwnershipAcceptancePage />
+  : publicMatch
+    ? (
+        <PublicObjectPage
+          publicId={decodeURIComponent(
+            publicMatch[1]
+          )}
+        />
+      )
+    : (
+        <>
+          <App />
+          <ObjectMemoryConsole />
+          <OwnershipConsole />
+          <PhysicalBridgeLauncher />
+        </>
+      );
 
 createRoot(root).render(
   <StrictMode>

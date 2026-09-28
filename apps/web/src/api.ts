@@ -1,9 +1,17 @@
 import type {
+  AssignOwnershipInput,
   CreateEventInput,
   CreateObjectInput,
+  CreateOwnerInput,
+  CreateOwnershipTransferInput,
   HealthResponse,
   OrybitEvent,
   OrybitObject,
+  OrybitOwner,
+  OwnershipSnapshot,
+  OwnershipTransfer,
+  OwnershipTransferSecret,
+  PublicTransferPreview,
   UpdateObjectInput
 } from "./types";
 
@@ -149,6 +157,143 @@ export class OrybitApi {
           method: "POST",
           body: JSON.stringify(input)
         }
+      );
+
+    return response.data;
+  }
+
+  async listOwners(): Promise<OrybitOwner[]> {
+    const response =
+      await this.request<
+        ApiListEnvelope<OrybitOwner>
+      >("/v1/owners");
+
+    return response.data;
+  }
+
+  async createOwner(
+    input: CreateOwnerInput
+  ): Promise<OrybitOwner> {
+    const response =
+      await this.request<
+        ApiEnvelope<OrybitOwner>
+      >(
+        "/v1/owners",
+        {
+          method: "POST",
+          body: JSON.stringify(input)
+        }
+      );
+
+    return response.data;
+  }
+
+  async getOwnership(
+    identifier: string
+  ): Promise<OwnershipSnapshot> {
+    const response =
+      await this.request<
+        ApiEnvelope<OwnershipSnapshot>
+      >(
+        `/v1/objects/${encodeURIComponent(
+          identifier
+        )}/ownership`
+      );
+
+    return response.data;
+  }
+
+  async assignOwnership(
+    identifier: string,
+    input: AssignOwnershipInput
+  ) {
+    const response =
+      await this.request<
+        ApiEnvelope<
+          OwnershipSnapshot["history"][number]
+        >
+      >(
+        `/v1/objects/${encodeURIComponent(
+          identifier
+        )}/ownership/assign`,
+        {
+          method: "POST",
+          body: JSON.stringify(input)
+        }
+      );
+
+    return response.data;
+  }
+
+  async createOwnershipTransfer(
+    identifier: string,
+    input: CreateOwnershipTransferInput
+  ): Promise<OwnershipTransferSecret> {
+    const response =
+      await this.request<
+        ApiEnvelope<OwnershipTransferSecret>
+      >(
+        `/v1/objects/${encodeURIComponent(
+          identifier
+        )}/ownership/transfers`,
+        {
+          method: "POST",
+          body: JSON.stringify(input)
+        }
+      );
+
+    return response.data;
+  }
+
+  async cancelOwnershipTransfer(
+    transferId: string
+  ): Promise<OwnershipTransfer> {
+    const response =
+      await this.request<
+        ApiEnvelope<OwnershipTransfer>
+      >(
+        `/v1/ownership-transfers/${encodeURIComponent(
+          transferId
+        )}/cancel`,
+        {
+          method: "POST"
+        }
+      );
+
+    return response.data;
+  }
+
+  async previewOwnershipTransfer(
+    token: string
+  ): Promise<PublicTransferPreview> {
+    const response =
+      await this.request<
+        ApiEnvelope<PublicTransferPreview>
+      >(
+        "/public/ownership-transfers/preview",
+        {
+          method: "POST",
+          body: JSON.stringify({ token })
+        },
+        false
+      );
+
+    return response.data;
+  }
+
+  async acceptOwnershipTransfer(
+    token: string
+  ): Promise<PublicTransferPreview> {
+    const response =
+      await this.request<
+        ApiEnvelope<PublicTransferPreview>
+      >(
+        "/public/ownership-transfers/accept",
+        {
+          method: "POST",
+          body: JSON.stringify({ token })
+        },
+        false
       );
 
     return response.data;

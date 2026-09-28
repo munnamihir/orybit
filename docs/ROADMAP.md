@@ -1,8 +1,8 @@
 # ORYBIT Roadmap
 
-## Phase 0 — Foundation
+## Phase 0 — Foundation — COMPLETE
 
-Define:
+Defined:
 
 - product vision
 - engineering principles
@@ -14,9 +14,9 @@ Define:
 - protocol SDK
 - runtime validation
 
-## Phase 1 — Object Registry
+## Phase 1 — Object Registry — COMPLETE
 
-Build:
+Built:
 
 - object creation
 - object persistence
@@ -26,40 +26,59 @@ Build:
 - D1 persistence adapter
 - automated registry tests
 
-## Phase 2 — Universal Object Page
+## Phase 2 — Universal Object Page — COMPLETE
 
-Build:
+Built:
 
 - mobile-first public object view
 - public/private field boundaries
 - object status
+- public-safe projection
 
-## Phase 3 — Physical-to-Digital Bridge
+## Phase 3 — Physical-to-Digital Bridge — COMPLETE
 
-Build:
+Built:
 
 - QR generation
 - QR resolution
-- NFC-compatible URI strategy
-- carrier registration
+- NFC-compatible HTTPS URI strategy
+- public object identity route
+- real physical-object phone scan demo
 
-## Phase 4 — Object Memory
+## Phase 4 — Object Memory — COMPLETE
 
-Build:
+Built:
 
 - event timeline
 - maintenance events
 - lifecycle events
-- immutable historical records where appropriate
+- append-only historical records
+- D1 event persistence
+- system registration events
+- admin Object Memory console
 
-## Phase 5 — Ownership
+## Phase 5 — Ownership — IN PROGRESS
 
-Build:
+Step 009 builds:
 
-- owner association
+- separate owner identities
+- initial owner association
+- one-active-owner invariant
 - ownership history
-- ownership transfer
-- privacy controls
+- secret ownership transfer invites
+- transfer acceptance and cancellation
+- transfer expiry
+- SHA-256 transfer-token storage
+- automatic ownership events in Object Memory
+- private ownership administration
+
+Future ownership work may include:
+
+- authenticated user-to-owner binding
+- stronger proof of physical possession
+- shared/delegated ownership
+- disputed transfer handling
+- configurable ownership visibility
 
 ## Phase 6 — Capability Engine
 
