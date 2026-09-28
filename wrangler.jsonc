@@ -5,5 +5,10 @@
   "workers_dev": true,
   "observability": {
     "enabled": true
+  },
+  "secrets": {
+    "required": [
+      "ORYBIT_ADMIN_TOKEN"
+    ]
   }
 }
