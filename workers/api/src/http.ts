@@ -3,6 +3,10 @@ import {
 } from "@orybit/protocol";
 
 import {
+  buildNewEvent
+} from "./event-factory.js";
+
+import {
   applyObjectPatch,
   buildNewObject
 } from "./object-factory.js";
@@ -12,7 +16,8 @@ import {
 } from "./public-object.js";
 
 import type {
-  CreateObjectInput,
+  CreateEventInput,
+  EventRepository,
   ObjectRepository,
   RequestRuntimeOptions,
   UpdateObjectInput
@@ -117,7 +122,7 @@ function isRecord(
 
 function toCreateInput(
   value: unknown
-): CreateObjectInput {
+) {
   if (!isRecord(value)) {
     throw new TypeError(
       "Request body must be a JSON object."
@@ -143,7 +148,8 @@ function toCreateInput(
     );
   }
 
-  return value as unknown as CreateObjectInput;
+  return value as unknown as
+    import("./types.js").CreateObjectInput;
 }
 
 function toUpdateInput(
@@ -172,12 +178,46 @@ function toUpdateInput(
   return value as UpdateObjectInput;
 }
 
+function toCreateEventInput(
+  value: unknown
+): CreateEventInput {
+  if (!isRecord(value)) {
+    throw new TypeError(
+      "Request body must be a JSON object."
+    );
+  }
+
+  if (
+    typeof value.type !== "string" ||
+    value.type.trim().length === 0
+  ) {
+    throw new TypeError(
+      "type is required."
+    );
+  }
+
+  return value as unknown as CreateEventInput;
+}
+
 function routeIdentifier(
   pathname: string
 ): string | null {
   const match =
     pathname.match(
       /^\/v1\/objects\/([^/]+)$/
+    );
+
+  return match
+    ? decodeURIComponent(match[1])
+    : null;
+}
+
+function eventRouteIdentifier(
+  pathname: string
+): string | null {
+  const match =
+    pathname.match(
+      /^\/v1\/objects\/([^/]+)\/events$/
     );
 
   return match
@@ -201,7 +241,8 @@ function publicRouteIdentifier(
 export async function handleRequest(
   request: Request,
   repository: ObjectRepository,
-  options: RequestRuntimeOptions = {}
+  options: RequestRuntimeOptions = {},
+  eventRepository?: EventRepository
 ): Promise<Response> {
   const url = new URL(request.url);
 
@@ -248,9 +289,13 @@ export async function handleRequest(
     });
   }
 
+  const eventIdentifier =
+    eventRouteIdentifier(url.pathname);
+
   if (
     url.pathname === "/v1/objects" ||
-    routeIdentifier(url.pathname)
+    routeIdentifier(url.pathname) ||
+    eventIdentifier
   ) {
     const authFailure =
       requireAdmin(request, options);
@@ -326,6 +371,88 @@ export async function handleRequest(
       data: objects,
       count: objects.length
     });
+  }
+
+  if (eventIdentifier) {
+    if (!eventRepository) {
+      return error(
+        503,
+        {
+          code: "EVENT_STORE_NOT_CONFIGURED",
+          message:
+            "ORYBIT Object Memory is not configured."
+        }
+      );
+    }
+
+    const object =
+      await repository.findByIdentifier(
+        eventIdentifier
+      );
+
+    if (!object) {
+      return error(
+        404,
+        {
+          code: "OBJECT_NOT_FOUND",
+          message:
+            "The requested ORYBIT object was not found."
+        }
+      );
+    }
+
+    if (request.method === "GET") {
+      const events =
+        await eventRepository.listForObject(
+          object.id
+        );
+
+      return json({
+        data: events,
+        count: events.length
+      });
+    }
+
+    if (request.method === "POST") {
+      try {
+        const body =
+          await parseJson(request);
+
+        const input =
+          toCreateEventInput(body);
+
+        const event =
+          buildNewEvent(
+            object.id,
+            input
+          );
+
+        const created =
+          await eventRepository.append(event);
+
+        return json(
+          {
+            data: created
+          },
+          201
+        );
+      } catch (cause) {
+        const message =
+          cause instanceof Error
+            ? cause.message
+            : "Event creation failed.";
+
+        return error(
+          400,
+          {
+            code: "INVALID_EVENT",
+            message:
+              "The lifecycle event is invalid.",
+            details: [message]
+          }
+        );
+      }
+    }
   }
 
   const identifier =
