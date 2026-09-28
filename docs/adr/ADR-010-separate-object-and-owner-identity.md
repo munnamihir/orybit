@@ -15,7 +15,9 @@ ORYBIT will model owner identity separately from object identity.
 
 An ownership record links an object to an owner for a bounded or ongoing time interval. A transfer closes the prior ownership interval and begins a new one while preserving the object's ORYBIT ID and public ID.
 
-Step 009 uses temporary capability links for transfer acceptance because ORYBIT does not yet have verified end-user accounts. Transfer secrets are stored only as SHA-256 hashes. The raw token is returned once and carried in the browser URL fragment until acceptance.
+Step 009 uses temporary capability links for transfer acceptance because ORYBIT does not yet have verified end-user accounts. Transfer secrets are random 256-bit bearer tokens. ORYBIT stores only a domain-separated, versioned SHA-512 verifier (`sha512-v1:<digest>`); the raw token is returned once and carried in the browser URL fragment until acceptance.
+
+The transfer verifier is intentionally a hash construction rather than a post-quantum public-key primitive. Actual PQC signatures and recipient-bound key establishment are specified separately in ADR-011.
 
 Regular public object profiles do not expose ownership data.
 
@@ -28,6 +30,7 @@ Regular public object profiles do not expose ownership data.
 - future permissions can reference the active owner independently from object identity
 - transfer logic can evolve without changing the object protocol
 - public object discovery remains separate from private ownership information
+- transfer-token verification has algorithm versioning and a quantum-hardened 512-bit hash output
 
 ### Tradeoffs
 
@@ -35,6 +38,7 @@ Regular public object profiles do not expose ownership data.
 - possession of a transfer capability link is not equivalent to legal proof of ownership
 - the system needs additional tables and lifecycle rules
 - future user-account integration will need to bind authenticated principals to owner records
+- PQC signing keys introduce a separate key-lifecycle problem and are not faked by calling a hash function "PQC"
 
 ## Alternatives considered
 
