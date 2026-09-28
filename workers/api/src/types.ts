@@ -53,6 +53,11 @@ export interface D1DatabaseLike {
   prepare(query: string): D1PreparedStatementLike;
 }
 
+export interface RequestRuntimeOptions {
+  adminToken?: string;
+}
+
 export interface Env {
   DB: D1DatabaseLike;
+  ORYBIT_ADMIN_TOKEN?: string;
 }
