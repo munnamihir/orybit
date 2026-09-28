@@ -1,5 +1,4 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
   "name": "orybit-api",
   "main": "workers/api/src/worker.ts",
   "compatibility_date": "2026-09-28",
