@@ -10,6 +10,7 @@ import {
 import type {
   CreateObjectInput,
   ObjectRepository,
+  RequestRuntimeOptions,
   UpdateObjectInput
 } from "./types.js";
 
@@ -29,7 +30,8 @@ function json(
       status,
       headers: {
         "content-type":
-          "application/json; charset=utf-8"
+          "application/json; charset=utf-8",
+        "cache-control": "no-store"
       }
     }
   );
@@ -45,6 +47,41 @@ function error(
     },
     status
   );
+}
+
+function requireAdmin(
+  request: Request,
+  options: RequestRuntimeOptions
+): Response | null {
+  if (!options.adminToken) {
+    return error(
+      503,
+      {
+        code: "ADMIN_AUTH_NOT_CONFIGURED",
+        message:
+          "ORYBIT admin authentication is not configured."
+      }
+    );
+  }
+
+  const authorization =
+    request.headers.get("authorization");
+
+  if (
+    authorization !==
+    `Bearer ${options.adminToken}`
+  ) {
+    return error(
+      401,
+      {
+        code: "UNAUTHORIZED",
+        message:
+          "A valid ORYBIT admin bearer token is required."
+      }
+    );
+  }
+
+  return null;
 }
 
 async function parseJson(
@@ -146,7 +183,8 @@ function routeIdentifier(
 
 export async function handleRequest(
   request: Request,
-  repository: ObjectRepository
+  repository: ObjectRepository,
+  options: RequestRuntimeOptions = {}
 ): Promise<Response> {
   const url = new URL(request.url);
 
@@ -160,6 +198,18 @@ export async function handleRequest(
       protocolVersion:
         ORYBIT_PROTOCOL_VERSION
     });
+  }
+
+  if (
+    url.pathname === "/v1/objects" ||
+    routeIdentifier(url.pathname)
+  ) {
+    const authFailure =
+      requireAdmin(request, options);
+
+    if (authFailure) {
+      return authFailure;
+    }
   }
 
   if (
