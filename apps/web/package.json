@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@orybit/protocol": "0.1.0",
+    "qr": "0.7.0",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },
