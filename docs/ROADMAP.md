@@ -22,6 +22,9 @@ Build:
 - object persistence
 - object lookup
 - management dashboard
+- REST object API
+- D1 persistence adapter
+- automated registry tests
 
 ## Phase 2 — Universal Object Page
 
