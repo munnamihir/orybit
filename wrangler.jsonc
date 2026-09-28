@@ -1,0 +1,21 @@
+{
+	"name": "orybit-api",
+	"main": "workers/api/src/worker.ts",
+	"compatibility_date": "2026-09-28",
+	"workers_dev": true,
+	"observability": {
+		"enabled": true
+	},
+	"secrets": {
+		"required": [
+			"ORYBIT_ADMIN_TOKEN"
+		]
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "orybit-registry",
+			"database_id": "a81eef1c-9e4c-4ef9-ba6d-fd9a4ab7a667"
+		}
+	]
+}

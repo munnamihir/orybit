@@ -6,6 +6,11 @@ import {
   MemoryObjectRepository
 } from "../dist/index.js";
 
+const adminToken = "test-admin-token";
+const runtimeOptions = {
+  adminToken
+};
+
 function request(
   path,
   init = {}
@@ -16,12 +21,29 @@ function request(
   );
 }
 
+function adminRequest(
+  path,
+  init = {}
+) {
+  return request(
+    path,
+    {
+      ...init,
+      headers: {
+        ...(init.headers ?? {}),
+        authorization:
+          `Bearer ${adminToken}`
+      }
+    }
+  );
+}
+
 async function json(response) {
   return response.json();
 }
 
 test(
-  "health endpoint exposes registry status",
+  "health endpoint remains public",
   async () => {
     const repository =
       new MemoryObjectRepository();
@@ -32,10 +54,7 @@ test(
         repository
       );
 
-    assert.equal(
-      response.status,
-      200
-    );
+    assert.equal(response.status, 200);
 
     assert.deepEqual(
       await json(response),
@@ -50,7 +69,30 @@ test(
 );
 
 test(
-  "creates an ORYBIT object",
+  "fails closed when admin auth is not configured",
+  async () => {
+    const repository =
+      new MemoryObjectRepository();
+
+    const response =
+      await handleRequest(
+        request("/v1/objects"),
+        repository
+      );
+
+    assert.equal(response.status, 503);
+
+    const body = await json(response);
+
+    assert.equal(
+      body.error.code,
+      "ADMIN_AUTH_NOT_CONFIGURED"
+    );
+  }
+);
+
+test(
+  "rejects an invalid admin token",
   async () => {
     const repository =
       new MemoryObjectRepository();
@@ -58,6 +100,38 @@ test(
     const response =
       await handleRequest(
         request(
+          "/v1/objects",
+          {
+            headers: {
+              authorization:
+                "Bearer wrong-token"
+            }
+          }
+        ),
+        repository,
+        runtimeOptions
+      );
+
+    assert.equal(response.status, 401);
+
+    const body = await json(response);
+
+    assert.equal(
+      body.error.code,
+      "UNAUTHORIZED"
+    );
+  }
+);
+
+test(
+  "creates an ORYBIT object with admin auth",
+  async () => {
+    const repository =
+      new MemoryObjectRepository();
+
+    const response =
+      await handleRequest(
+        adminRequest(
           "/v1/objects",
           {
             method: "POST",
@@ -79,16 +153,13 @@ test(
             })
           }
         ),
-        repository
+        repository,
+        runtimeOptions
       );
 
-    assert.equal(
-      response.status,
-      201
-    );
+    assert.equal(response.status, 201);
 
-    const body =
-      await json(response);
+    const body = await json(response);
 
     assert.equal(
       body.data.protocolVersion,
@@ -120,7 +191,7 @@ test(
 
     const response =
       await handleRequest(
-        request(
+        adminRequest(
           "/v1/objects",
           {
             method: "POST",
@@ -134,16 +205,13 @@ test(
               })
           }
         ),
-        repository
+        repository,
+        runtimeOptions
       );
 
-    assert.equal(
-      response.status,
-      400
-    );
+    assert.equal(response.status, 400);
 
-    const body =
-      await json(response);
+    const body = await json(response);
 
     assert.equal(
       body.error.code,
@@ -163,7 +231,7 @@ test(
       "Object B"
     ]) {
       await handleRequest(
-        request(
+        adminRequest(
           "/v1/objects",
           {
             method: "POST",
@@ -180,28 +248,22 @@ test(
               })
           }
         ),
-        repository
+        repository,
+        runtimeOptions
       );
     }
 
     const response =
       await handleRequest(
-        request("/v1/objects"),
-        repository
+        adminRequest("/v1/objects"),
+        repository,
+        runtimeOptions
       );
 
-    const body =
-      await json(response);
+    const body = await json(response);
 
-    assert.equal(
-      response.status,
-      200
-    );
-
-    assert.equal(
-      body.count,
-      2
-    );
+    assert.equal(response.status, 200);
+    assert.equal(body.count, 2);
   }
 );
 
@@ -213,7 +275,7 @@ test(
 
     const createResponse =
       await handleRequest(
-        request(
+        adminRequest(
           "/v1/objects",
           {
             method: "POST",
@@ -233,7 +295,8 @@ test(
               })
           }
         ),
-        repository
+        repository,
+        runtimeOptions
       );
 
     assert.equal(
@@ -243,20 +306,16 @@ test(
 
     const response =
       await handleRequest(
-        request(
+        adminRequest(
           "/v1/objects/demo-tool-001"
         ),
-        repository
+        repository,
+        runtimeOptions
       );
 
-    const body =
-      await json(response);
+    const body = await json(response);
 
-    assert.equal(
-      response.status,
-      200
-    );
-
+    assert.equal(response.status, 200);
     assert.equal(
       body.data.publicId,
       "demo-tool-001"
@@ -271,7 +330,7 @@ test(
       new MemoryObjectRepository();
 
     await handleRequest(
-      request(
+      adminRequest(
         "/v1/objects",
         {
           method: "POST",
@@ -291,12 +350,13 @@ test(
             })
         }
       ),
-      repository
+      repository,
+      runtimeOptions
     );
 
     const response =
       await handleRequest(
-        request(
+        adminRequest(
           "/v1/objects/bike-demo-001",
           {
             method: "PATCH",
@@ -316,17 +376,13 @@ test(
               })
           }
         ),
-        repository
+        repository,
+        runtimeOptions
       );
 
-    const body =
-      await json(response);
+    const body = await json(response);
 
-    assert.equal(
-      response.status,
-      200
-    );
-
+    assert.equal(response.status, 200);
     assert.equal(
       body.data.identity.model,
       "Road X1"
@@ -343,26 +399,23 @@ test(
 );
 
 test(
-  "returns 404 for unknown objects",
+  "returns 404 for unknown objects after auth",
   async () => {
     const repository =
       new MemoryObjectRepository();
 
     const response =
       await handleRequest(
-        request(
+        adminRequest(
           "/v1/objects/missing-object"
         ),
-        repository
+        repository,
+        runtimeOptions
       );
 
-    assert.equal(
-      response.status,
-      404
-    );
+    assert.equal(response.status, 404);
 
-    const body =
-      await json(response);
+    const body = await json(response);
 
     assert.equal(
       body.error.code,

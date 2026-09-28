@@ -20,7 +20,11 @@ export default {
 
     return handleRequest(
       request,
-      repository
+      repository,
+      {
+        adminToken:
+          env.ORYBIT_ADMIN_TOKEN
+      }
     );
   }
 };
