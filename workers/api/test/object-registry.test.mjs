@@ -1,0 +1,372 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+
+import {
+  handleRequest,
+  MemoryObjectRepository
+} from "../dist/index.js";
+
+function request(
+  path,
+  init = {}
+) {
+  return new Request(
+    `https://api.orybit.test${path}`,
+    init
+  );
+}
+
+async function json(response) {
+  return response.json();
+}
+
+test(
+  "health endpoint exposes registry status",
+  async () => {
+    const repository =
+      new MemoryObjectRepository();
+
+    const response =
+      await handleRequest(
+        request("/health"),
+        repository
+      );
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.deepEqual(
+      await json(response),
+      {
+        status: "ok",
+        service:
+          "orybit-object-registry",
+        protocolVersion: "0.1"
+      }
+    );
+  }
+);
+
+test(
+  "creates an ORYBIT object",
+  async () => {
+    const repository =
+      new MemoryObjectRepository();
+
+    const response =
+      await handleRequest(
+        request(
+          "/v1/objects",
+          {
+            method: "POST",
+            headers: {
+              "content-type":
+                "application/json"
+            },
+            body: JSON.stringify({
+              kind: "appliance",
+              identity: {
+                name:
+                  "Test Coffee Machine",
+                manufacturer:
+                  "Demo Appliances"
+              },
+              capabilities: [
+                "manual.view"
+              ]
+            })
+          }
+        ),
+        repository
+      );
+
+    assert.equal(
+      response.status,
+      201
+    );
+
+    const body =
+      await json(response);
+
+    assert.equal(
+      body.data.protocolVersion,
+      "0.1"
+    );
+
+    assert.match(
+      body.data.id,
+      /^obj_/
+    );
+
+    assert.match(
+      body.data.publicId,
+      /^o-/
+    );
+
+    assert.equal(
+      body.data.lifecycle.status,
+      "active"
+    );
+  }
+);
+
+test(
+  "rejects invalid object creation",
+  async () => {
+    const repository =
+      new MemoryObjectRepository();
+
+    const response =
+      await handleRequest(
+        request(
+          "/v1/objects",
+          {
+            method: "POST",
+            headers: {
+              "content-type":
+                "application/json"
+            },
+            body:
+              JSON.stringify({
+                kind: ""
+              })
+          }
+        ),
+        repository
+      );
+
+    assert.equal(
+      response.status,
+      400
+    );
+
+    const body =
+      await json(response);
+
+    assert.equal(
+      body.error.code,
+      "INVALID_OBJECT"
+    );
+  }
+);
+
+test(
+  "lists registered objects",
+  async () => {
+    const repository =
+      new MemoryObjectRepository();
+
+    for (const name of [
+      "Object A",
+      "Object B"
+    ]) {
+      await handleRequest(
+        request(
+          "/v1/objects",
+          {
+            method: "POST",
+            headers: {
+              "content-type":
+                "application/json"
+            },
+            body:
+              JSON.stringify({
+                kind: "tool",
+                identity: {
+                  name
+                }
+              })
+          }
+        ),
+        repository
+      );
+    }
+
+    const response =
+      await handleRequest(
+        request("/v1/objects"),
+        repository
+      );
+
+    const body =
+      await json(response);
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.equal(
+      body.count,
+      2
+    );
+  }
+);
+
+test(
+  "retrieves an object by public ID",
+  async () => {
+    const repository =
+      new MemoryObjectRepository();
+
+    const createResponse =
+      await handleRequest(
+        request(
+          "/v1/objects",
+          {
+            method: "POST",
+            headers: {
+              "content-type":
+                "application/json"
+            },
+            body:
+              JSON.stringify({
+                publicId:
+                  "demo-tool-001",
+                kind: "tool",
+                identity: {
+                  name:
+                    "Demo Tool"
+                }
+              })
+          }
+        ),
+        repository
+      );
+
+    assert.equal(
+      createResponse.status,
+      201
+    );
+
+    const response =
+      await handleRequest(
+        request(
+          "/v1/objects/demo-tool-001"
+        ),
+        repository
+      );
+
+    const body =
+      await json(response);
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.equal(
+      body.data.publicId,
+      "demo-tool-001"
+    );
+  }
+);
+
+test(
+  "updates an existing object",
+  async () => {
+    const repository =
+      new MemoryObjectRepository();
+
+    await handleRequest(
+      request(
+        "/v1/objects",
+        {
+          method: "POST",
+          headers: {
+            "content-type":
+              "application/json"
+          },
+          body:
+            JSON.stringify({
+              publicId:
+                "bike-demo-001",
+              kind: "bicycle",
+              identity: {
+                name:
+                  "Demo Bicycle"
+              }
+            })
+        }
+      ),
+      repository
+    );
+
+    const response =
+      await handleRequest(
+        request(
+          "/v1/objects/bike-demo-001",
+          {
+            method: "PATCH",
+            headers: {
+              "content-type":
+                "application/json"
+            },
+            body:
+              JSON.stringify({
+                identity: {
+                  model: "Road X1"
+                },
+                capabilities: [
+                  "manual.view",
+                  "maintenance.record"
+                ]
+              })
+          }
+        ),
+        repository
+      );
+
+    const body =
+      await json(response);
+
+    assert.equal(
+      response.status,
+      200
+    );
+
+    assert.equal(
+      body.data.identity.model,
+      "Road X1"
+    );
+
+    assert.deepEqual(
+      body.data.capabilities,
+      [
+        "manual.view",
+        "maintenance.record"
+      ]
+    );
+  }
+);
+
+test(
+  "returns 404 for unknown objects",
+  async () => {
+    const repository =
+      new MemoryObjectRepository();
+
+    const response =
+      await handleRequest(
+        request(
+          "/v1/objects/missing-object"
+        ),
+        repository
+      );
+
+    assert.equal(
+      response.status,
+      404
+    );
+
+    const body =
+      await json(response);
+
+    assert.equal(
+      body.error.code,
+      "OBJECT_NOT_FOUND"
+    );
+  }
+);
