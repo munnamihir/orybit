@@ -6,12 +6,15 @@ import {
 } from "react-dom/client";
 
 import App from "./App";
+import ObjectMemoryConsole
+  from "./ObjectMemoryConsole";
 import PhysicalBridgeLauncher
   from "./PhysicalBridgeLauncher";
 import PublicObjectPage
   from "./PublicObjectPage";
 import "./styles.css";
 import "./physical-object.css";
+import "./object-memory.css";
 
 const root =
   document.getElementById("root");
@@ -38,6 +41,7 @@ const content = publicMatch
   : (
       <>
         <App />
+        <ObjectMemoryConsole />
         <PhysicalBridgeLauncher />
       </>
     );
