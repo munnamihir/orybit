@@ -1,0 +1,327 @@
+import {
+  ORYBIT_PROTOCOL_VERSION
+} from "@orybit/protocol";
+
+import {
+  applyObjectPatch,
+  buildNewObject
+} from "./object-factory.js";
+
+import type {
+  CreateObjectInput,
+  ObjectRepository,
+  UpdateObjectInput
+} from "./types.js";
+
+interface ApiError {
+  code: string;
+  message: string;
+  details?: string[];
+}
+
+function json(
+  body: unknown,
+  status = 200
+): Response {
+  return new Response(
+    JSON.stringify(body, null, 2),
+    {
+      status,
+      headers: {
+        "content-type":
+          "application/json; charset=utf-8"
+      }
+    }
+  );
+}
+
+function error(
+  status: number,
+  value: ApiError
+): Response {
+  return json(
+    {
+      error: value
+    },
+    status
+  );
+}
+
+async function parseJson(
+  request: Request
+): Promise<unknown> {
+  const contentType =
+    request.headers.get("content-type") ?? "";
+
+  if (
+    !contentType
+      .toLowerCase()
+      .includes("application/json")
+  ) {
+    throw new TypeError(
+      "Content-Type must be application/json."
+    );
+  }
+
+  return request.json();
+}
+
+function isRecord(
+  value: unknown
+): value is Record<string, unknown> {
+  return typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value);
+}
+
+function toCreateInput(
+  value: unknown
+): CreateObjectInput {
+  if (!isRecord(value)) {
+    throw new TypeError(
+      "Request body must be a JSON object."
+    );
+  }
+
+  if (
+    typeof value.kind !== "string" ||
+    value.kind.trim().length === 0
+  ) {
+    throw new TypeError(
+      "kind is required."
+    );
+  }
+
+  if (
+    !isRecord(value.identity) ||
+    typeof value.identity.name !== "string" ||
+    value.identity.name.trim().length === 0
+  ) {
+    throw new TypeError(
+      "identity.name is required."
+    );
+  }
+
+  return value as unknown as CreateObjectInput;
+}
+
+function toUpdateInput(
+  value: unknown
+): UpdateObjectInput {
+  if (!isRecord(value)) {
+    throw new TypeError(
+      "Request body must be a JSON object."
+    );
+  }
+
+  const forbidden = [
+    "id",
+    "publicId",
+    "protocolVersion"
+  ].filter(
+    (key) => key in value
+  );
+
+  if (forbidden.length > 0) {
+    throw new TypeError(
+      `${forbidden.join(", ")} cannot be changed.`
+    );
+  }
+
+  return value as UpdateObjectInput;
+}
+
+function routeIdentifier(
+  pathname: string
+): string | null {
+  const match =
+    pathname.match(
+      /^\/v1\/objects\/([^/]+)$/
+    );
+
+  return match
+    ? decodeURIComponent(match[1])
+    : null;
+}
+
+export async function handleRequest(
+  request: Request,
+  repository: ObjectRepository
+): Promise<Response> {
+  const url = new URL(request.url);
+
+  if (
+    request.method === "GET" &&
+    url.pathname === "/health"
+  ) {
+    return json({
+      status: "ok",
+      service: "orybit-object-registry",
+      protocolVersion:
+        ORYBIT_PROTOCOL_VERSION
+    });
+  }
+
+  if (
+    request.method === "POST" &&
+    url.pathname === "/v1/objects"
+  ) {
+    try {
+      const body =
+        await parseJson(request);
+
+      const input =
+        toCreateInput(body);
+
+      const object =
+        buildNewObject(input);
+
+      const created =
+        await repository.create(object);
+
+      return json(
+        {
+          data: created
+        },
+        201
+      );
+    } catch (cause) {
+      const message =
+        cause instanceof Error
+          ? cause.message
+          : "Object creation failed.";
+
+      if (
+        message ===
+        "PUBLIC_ID_ALREADY_EXISTS"
+      ) {
+        return error(
+          409,
+          {
+            code:
+              "PUBLIC_ID_ALREADY_EXISTS",
+            message:
+              "An object with this publicId already exists."
+          }
+        );
+      }
+
+      return error(
+        400,
+        {
+          code: "INVALID_OBJECT",
+          message: "Object is invalid.",
+          details: [message]
+        }
+      );
+    }
+  }
+
+  if (
+    request.method === "GET" &&
+    url.pathname === "/v1/objects"
+  ) {
+    const objects =
+      await repository.list();
+
+    return json({
+      data: objects,
+      count: objects.length
+    });
+  }
+
+  const identifier =
+    routeIdentifier(url.pathname);
+
+  if (
+    request.method === "GET" &&
+    identifier
+  ) {
+    const object =
+      await repository
+        .findByIdentifier(identifier);
+
+    if (!object) {
+      return error(
+        404,
+        {
+          code: "OBJECT_NOT_FOUND",
+          message:
+            "The requested ORYBIT object was not found."
+        }
+      );
+    }
+
+    return json({
+      data: object
+    });
+  }
+
+  if (
+    request.method === "PATCH" &&
+    identifier
+  ) {
+    const current =
+      await repository
+        .findByIdentifier(identifier);
+
+    if (!current) {
+      return error(
+        404,
+        {
+          code: "OBJECT_NOT_FOUND",
+          message:
+            "The requested ORYBIT object was not found."
+        }
+      );
+    }
+
+    try {
+      const body =
+        await parseJson(request);
+
+      const patch =
+        toUpdateInput(body);
+
+      const updated =
+        applyObjectPatch(
+          current,
+          patch
+        );
+
+      const saved =
+        await repository.update(
+          current.id,
+          updated
+        );
+
+      return json({
+        data: saved
+      });
+    } catch (cause) {
+      const message =
+        cause instanceof Error
+          ? cause.message
+          : "Object update failed.";
+
+      return error(
+        400,
+        {
+          code: "INVALID_UPDATE",
+          message:
+            "The object update is invalid.",
+          details: [message]
+        }
+      );
+    }
+  }
+
+  return error(
+    404,
+    {
+      code: "ROUTE_NOT_FOUND",
+      message:
+        "The requested ORYBIT API route does not exist."
+    }
+  );
+}
