@@ -55,8 +55,8 @@ Only one pending transfer may exist for an object at a time.
 Step 009 does not yet have end-user accounts or verified identities. Instead, transfer acceptance uses a temporary capability secret.
 
 1. An administrator initiates a transfer.
-2. ORYBIT generates a cryptographically random transfer token.
-3. ORYBIT stores only the SHA-256 hash of that token.
+2. ORYBIT generates a cryptographically random 256-bit transfer token.
+3. ORYBIT domain-separates the token and stores only a versioned SHA-512 verifier in the form `sha512-v1:<digest>`.
 4. The raw token is returned once to the administrator.
 5. The dashboard creates an acceptance URL using the URL fragment:
 
@@ -66,7 +66,22 @@ Step 009 does not yet have end-user accounts or verified identities. Instead, tr
 7. The acceptance page reads the fragment in the browser and sends the token only to the dedicated transfer API.
 8. After acceptance, the prior ownership record is closed and a new record begins.
 
+SHA-512 is used here as the token-verification hash, not as a post-quantum public-key algorithm. For a random bearer token, SHA-512 retains approximately 256-bit preimage work even under the generic Grover quantum speedup. The version prefix and domain separator also give ORYBIT algorithm agility for future verifier upgrades.
+
 The capability link proves possession of the invitation. It does **not** prove a recipient's legal identity. Verified user accounts and stronger ownership proof are future work.
+
+## Post-quantum direction
+
+ORYBIT keeps the cryptographic roles separate:
+
+- token verifier: SHA-512 with domain separation and algorithm versioning
+- transfer signatures: target ML-DSA-87, the highest-security parameter set in NIST FIPS 204
+- recipient-bound encrypted handoff: target ML-KEM-1024 from NIST FIPS 203 if ORYBIT later binds transfers to recipient public keys
+- alternative signature diversity: SLH-DSA from NIST FIPS 205 can be evaluated where larger hash-based signatures are acceptable
+
+ML-DSA and ML-KEM should not be substituted for a hash function. They solve digital-signature and key-establishment problems respectively.
+
+ORYBIT will not describe the Step 009 bearer-token verifier itself as "PQC." The system is instead designed to be **PQC-ready**, with actual post-quantum public-key operations added only where their security properties are relevant.
 
 ## API
 
@@ -119,7 +134,7 @@ Migration `0003_ownership.sql` enforces:
 - one pending transfer per object
 - no transfer from an owner to the same owner
 - foreign-key links to objects and owners
-- unique transfer-token hashes
+- unique transfer-token verifiers
 
 Transfer acceptance uses a D1 batch so closing the previous record, creating the new ownership record, and accepting the transfer succeed or fail together.
 
@@ -131,6 +146,8 @@ Step 009 intentionally does not yet provide:
 - email delivery
 - verified legal identity
 - cryptographic proof of possession of the physical object
+- ML-DSA-signed transfer receipts
+- ML-KEM recipient-bound transfer encryption
 - disputed-transfer resolution
 - public ownership visibility
 - delegated/shared ownership
