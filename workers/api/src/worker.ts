@@ -7,6 +7,10 @@ import {
 } from "./d1-repository.js";
 
 import {
+  D1OwnershipRepository
+} from "./d1-ownership-repository.js";
+
+import {
   handleRequest
 } from "./http.js";
 
@@ -25,6 +29,9 @@ export default {
     const eventRepository =
       new D1EventRepository(env.DB);
 
+    const ownershipRepository =
+      new D1OwnershipRepository(env.DB);
+
     return handleRequest(
       request,
       repository,
@@ -32,7 +39,8 @@ export default {
         adminToken:
           env.ORYBIT_ADMIN_TOKEN
       },
-      eventRepository
+      eventRepository,
+      ownershipRepository
     );
   }
 };
