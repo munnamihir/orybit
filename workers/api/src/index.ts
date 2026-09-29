@@ -1,4 +1,8 @@
 export {
+  D1CapabilityRepository
+} from "./d1-capability-repository.js";
+
+export {
   D1EventRepository
 } from "./d1-event-repository.js";
 
@@ -11,12 +15,32 @@ export {
 } from "./d1-ownership-repository.js";
 
 export {
+  buildCapabilityDefinition,
+  findUndefinedCapabilities,
+  publicCapabilityNames,
+  resolveObjectCapabilities,
+  setObjectCapability
+} from "./capability-service.js";
+
+export {
+  handleCapabilityRequest
+} from "./capability-http.js";
+
+export {
   buildNewEvent
 } from "./event-factory.js";
 
 export {
   handleRequest
 } from "./http.js";
+
+export {
+  handleRuntimeRequest
+} from "./runtime.js";
+
+export {
+  MemoryCapabilityRepository
+} from "./memory-capability-repository.js";
 
 export {
   MemoryEventRepository
@@ -41,6 +65,13 @@ export {
   createTransferSecret,
   resolveTransferToken
 } from "./ownership-service.js";
+
+export type {
+  CapabilityDefinitionInput,
+  CapabilityRepository,
+  CapabilityResolutionStatus,
+  ResolvedObjectCapability
+} from "./capability-types.js";
 
 export type {
   AssignOwnershipInput,

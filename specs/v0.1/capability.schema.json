@@ -45,6 +45,18 @@
     "requiresApproval": {
       "type": "boolean",
       "default": false
+    },
+    "category": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "operation": {
+      "type": "string",
+      "enum": [
+        "read",
+        "write",
+        "execute"
+      ]
     }
   }
 }

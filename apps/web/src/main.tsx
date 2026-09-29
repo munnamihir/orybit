@@ -6,6 +6,8 @@ import {
 } from "react-dom/client";
 
 import App from "./App";
+import CapabilityEngineConsole
+  from "./CapabilityEngineConsole";
 import ObjectMemoryConsole
   from "./ObjectMemoryConsole";
 import OwnershipAcceptancePage
@@ -20,6 +22,7 @@ import "./styles.css";
 import "./physical-object.css";
 import "./object-memory.css";
 import "./ownership.css";
+import "./capability-engine.css";
 
 const root =
   document.getElementById("root");
@@ -55,6 +58,7 @@ const content = isOwnershipAcceptance
           <App />
           <ObjectMemoryConsole />
           <OwnershipConsole />
+          <CapabilityEngineConsole />
           <PhysicalBridgeLauncher />
         </>
       );

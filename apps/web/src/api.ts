@@ -1,10 +1,12 @@
 import type {
   AssignOwnershipInput,
+  CapabilityDefinitionInput,
   CreateEventInput,
   CreateObjectInput,
   CreateOwnerInput,
   CreateOwnershipTransferInput,
   HealthResponse,
+  OrybitCapability,
   OrybitEvent,
   OrybitObject,
   OrybitOwner,
@@ -12,6 +14,7 @@ import type {
   OwnershipTransfer,
   OwnershipTransferSecret,
   PublicTransferPreview,
+  ResolvedObjectCapability,
   UpdateObjectInput
 } from "./types";
 
@@ -123,6 +126,112 @@ export class OrybitApi {
           body: JSON.stringify(input)
         }
       );
+
+    return response.data;
+  }
+
+  async listCapabilityDefinitions():
+  Promise<OrybitCapability[]> {
+    const response = await this.request<
+      ApiListEnvelope<OrybitCapability>
+    >("/v1/capabilities");
+
+    return response.data;
+  }
+
+  async createCapabilityDefinition(
+    input: CapabilityDefinitionInput
+  ): Promise<OrybitCapability> {
+    const response = await this.request<
+      ApiEnvelope<OrybitCapability>
+    >(
+      "/v1/capabilities",
+      {
+        method: "POST",
+        body: JSON.stringify(input)
+      }
+    );
+
+    return response.data;
+  }
+
+  async updateCapabilityDefinition(
+    name: string,
+    input: Partial<CapabilityDefinitionInput>
+  ): Promise<OrybitCapability> {
+    const response = await this.request<
+      ApiEnvelope<OrybitCapability>
+    >(
+      `/v1/capabilities/${encodeURIComponent(
+        name
+      )}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(input)
+      }
+    );
+
+    return response.data;
+  }
+
+  async listObjectCapabilities(
+    identifier: string
+  ): Promise<ResolvedObjectCapability[]> {
+    const response = await this.request<
+      ApiListEnvelope<ResolvedObjectCapability>
+    >(
+      `/v1/objects/${encodeURIComponent(
+        identifier
+      )}/capabilities`
+    );
+
+    return response.data;
+  }
+
+  async enableObjectCapability(
+    identifier: string,
+    name: string
+  ): Promise<{
+    object: OrybitObject;
+    capabilities: ResolvedObjectCapability[];
+  }> {
+    const response = await this.request<
+      ApiEnvelope<{
+        object: OrybitObject;
+        capabilities: ResolvedObjectCapability[];
+      }>
+    >(
+      `/v1/objects/${encodeURIComponent(
+        identifier
+      )}/capabilities/${encodeURIComponent(
+        name
+      )}`,
+      { method: "PUT" }
+    );
+
+    return response.data;
+  }
+
+  async disableObjectCapability(
+    identifier: string,
+    name: string
+  ): Promise<{
+    object: OrybitObject;
+    capabilities: ResolvedObjectCapability[];
+  }> {
+    const response = await this.request<
+      ApiEnvelope<{
+        object: OrybitObject;
+        capabilities: ResolvedObjectCapability[];
+      }>
+    >(
+      `/v1/objects/${encodeURIComponent(
+        identifier
+      )}/capabilities/${encodeURIComponent(
+        name
+      )}`,
+      { method: "DELETE" }
+    );
 
     return response.data;
   }

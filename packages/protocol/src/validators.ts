@@ -10,6 +10,7 @@ import {
 import type {
   ActorType,
   CapabilityAccess,
+  CapabilityOperation,
   CarrierType,
   LifecycleStatus,
   OrybitCapability,
@@ -47,8 +48,18 @@ const capabilityAccessValues = new Set<CapabilityAccess>([
   "authorized"
 ]);
 
+const capabilityOperationValues =
+  new Set<CapabilityOperation>([
+    "read",
+    "write",
+    "execute"
+  ]);
+
 const capabilityNamePattern =
   /^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)+$/;
+
+const capabilityCategoryPattern =
+  /^[a-z][a-z0-9-]*$/;
 
 const eventTypePattern =
   /^[a-z][a-z0-9]*(\.[a-z][a-z0-9]*)*$/;
@@ -367,6 +378,31 @@ export function validateOrybitCapability(
   ) {
     errors.push(
       "requiresApproval must be a boolean when provided."
+    );
+  }
+
+  if (
+    input.category !== undefined &&
+    (
+      typeof input.category !== "string" ||
+      !capabilityCategoryPattern.test(
+        input.category
+      )
+    )
+  ) {
+    errors.push(
+      "category must use lowercase kebab-case."
+    );
+  }
+
+  if (
+    input.operation !== undefined &&
+    !capabilityOperationValues.has(
+      input.operation as CapabilityOperation
+    )
+  ) {
+    errors.push(
+      "operation must be read, write, or execute."
     );
   }
 

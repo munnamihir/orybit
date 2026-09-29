@@ -57,9 +57,9 @@ Built:
 - system registration events
 - admin Object Memory console
 
-## Phase 5 — Ownership — IN PROGRESS
+## Phase 5 — Ownership — COMPLETE
 
-Step 009 builds:
+Built:
 
 - separate owner identities
 - initial owner association
@@ -68,9 +68,10 @@ Step 009 builds:
 - secret ownership transfer invites
 - transfer acceptance and cancellation
 - transfer expiry
-- SHA-256 transfer-token storage
+- domain-separated SHA-512 transfer-token verifier
 - automatic ownership events in Object Memory
 - private ownership administration
+- PQC-ready cryptographic roadmap for ML-DSA / ML-KEM
 
 Future ownership work may include:
 
@@ -79,15 +80,27 @@ Future ownership work may include:
 - shared/delegated ownership
 - disputed transfer handling
 - configurable ownership visibility
+- ML-DSA signed transfer records
+- ML-KEM recipient-bound handoff
 
-## Phase 6 — Capability Engine
+## Phase 6 — Capability Engine — IN PROGRESS
 
-Build:
+Step 010 builds:
 
-- capability registry
-- capability discovery
-- capability-driven UI
-- access classifications
+- persistent capability definition registry
+- structured capability metadata
+- category semantics
+- read/write/execute operation semantics
+- public / owner / authorized access hints
+- approval hints
+- per-object capability enable/disable
+- structured capability resolution
+- unresolved legacy capability detection
+- capability assignment enforcement
+- public capability filtering
+- Capability Engine management console
+
+The Capability Engine describes **what an object can do**. PermissionOS will later decide **who may invoke those capabilities and under which policy**.
 
 ## Phase 7 — Object Manifest
 
