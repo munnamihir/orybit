@@ -81,9 +81,9 @@ Something that happened during the object's lifecycle.
 
 ### Capability
 
-Something that can be done with or through an object.
+A structured definition of an ability exposed by an ORYBIT object. Objects continue to reference capability names so protocol v0.1 remains compact and backward compatible.
 
-Ownership is currently implemented as a runtime domain layered on top of persistent object identity and append-only lifecycle events. It is intentionally separate from the object identity itself.
+Ownership is implemented as a runtime domain layered on top of persistent object identity and append-only lifecycle events. It is intentionally separate from the object identity itself.
 
 ## Current Architecture
 
@@ -103,10 +103,11 @@ Cloudflare D1
       ├── object_events
       ├── owners
       ├── ownership_records
-      └── ownership_transfers
+      ├── ownership_transfers
+      └── capability_definitions
 ```
 
-The React dashboard, public object page, public ownership-transfer acceptance page, and API are deployed from the same Cloudflare Worker origin.
+The React dashboard, public object page, public ownership-transfer acceptance page, Capability Engine console, and API are deployed from the same Cloudflare Worker origin.
 
 ## Current Features
 
@@ -140,10 +141,26 @@ The React dashboard, public object page, public ownership-transfer acceptance pa
 - ownership history
 - pending transfer creation and cancellation
 - secret capability-link acceptance
-- SHA-256 transfer-token storage
+- domain-separated, versioned SHA-512 transfer-token verifier
 - transfer expiry
 - automatic ownership lifecycle events
 - no ownership data on normal public QR profiles
+- PQC-ready design direction documented for ML-DSA-87 and ML-KEM-1024
+
+### Capability Engine
+
+- persistent structured capability definition registry
+- capability category and read/write/execute operation semantics
+- public / owner / authorized access hints
+- approval hints
+- per-object capability enable/disable
+- structured capability resolution
+- unresolved legacy capability detection
+- object creation/update enforcement for registered capability names
+- public profiles expose only capabilities whose definitions are marked public
+- dedicated Capability Engine admin console
+
+Capability access classifications are descriptive hints in Step 010. They are **not** a replacement for PermissionOS authorization.
 
 ## API
 
@@ -164,6 +181,14 @@ GET   /v1/objects/:identifier/ownership
 POST  /v1/objects/:identifier/ownership/assign
 POST  /v1/objects/:identifier/ownership/transfers
 POST  /v1/ownership-transfers/:transferId/cancel
+
+GET   /v1/capabilities
+POST  /v1/capabilities
+GET   /v1/capabilities/:name
+PATCH /v1/capabilities/:name
+GET   /v1/objects/:identifier/capabilities
+PUT   /v1/objects/:identifier/capabilities/:name
+DELETE /v1/objects/:identifier/capabilities/:name
 ```
 
 Public routes include:
@@ -242,7 +267,8 @@ Admin Dashboard               ✓
 Public Object Profile         ✓
 QR Physical Bridge            ✓
 Object Memory                 ✓
-Ownership                     IN PROGRESS
+Ownership                     ✓
+Capability Engine             IN PROGRESS
 ```
 
 See:
@@ -250,6 +276,7 @@ See:
 - [`docs/OBJECT-REGISTRY.md`](docs/OBJECT-REGISTRY.md)
 - [`docs/OBJECT-MEMORY.md`](docs/OBJECT-MEMORY.md)
 - [`docs/OWNERSHIP.md`](docs/OWNERSHIP.md)
+- [`docs/CAPABILITY-ENGINE.md`](docs/CAPABILITY-ENGINE.md)
 - [`docs/adr/`](docs/adr/)
 
 ## Direction

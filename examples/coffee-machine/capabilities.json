@@ -5,7 +5,9 @@
     "title": "View Manual",
     "description": "View documentation associated with this object.",
     "access": "public",
-    "requiresApproval": false
+    "requiresApproval": false,
+    "category": "documentation",
+    "operation": "read"
   },
   {
     "protocolVersion": "0.1",
@@ -13,14 +15,18 @@
     "title": "Record Maintenance",
     "description": "Add a maintenance event to this object's lifecycle.",
     "access": "owner",
-    "requiresApproval": true
+    "requiresApproval": false,
+    "category": "maintenance",
+    "operation": "write"
   },
   {
     "protocolVersion": "0.1",
     "name": "warranty.view",
     "title": "View Warranty",
     "description": "View warranty information associated with this object.",
-    "access": "owner",
-    "requiresApproval": false
+    "access": "public",
+    "requiresApproval": false,
+    "category": "warranty",
+    "operation": "read"
   }
 ]
