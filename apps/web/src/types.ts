@@ -177,6 +177,31 @@ export interface PublicTransferPreview {
   object: PublicObjectProfile;
 }
 
+export type DeveloperScope =
+  | "objects:read"
+  | "manifests:read"
+  | "capabilities:read";
+
+export interface DeveloperApiKey {
+  id: string;
+  name: string;
+  keyPrefix: string;
+  scopes: DeveloperScope[];
+  createdAt: string;
+  lastUsedAt?: string;
+  revokedAt?: string;
+}
+
+export interface CreateDeveloperApiKeyInput {
+  name: string;
+  scopes: DeveloperScope[];
+}
+
+export interface DeveloperApiKeySecret {
+  key: DeveloperApiKey;
+  apiKey: string;
+}
+
 export interface DashboardSummary {
   total: number;
   active: number;
