@@ -3,6 +3,10 @@ import {
 } from "./d1-capability-repository.js";
 
 import {
+  D1DeveloperApiKeyRepository
+} from "./d1-developer-key-repository.js";
+
+import {
   D1EventRepository
 } from "./d1-event-repository.js";
 
@@ -39,6 +43,9 @@ export default {
     const capabilityRepository =
       new D1CapabilityRepository(env.DB);
 
+    const developerKeyRepository =
+      new D1DeveloperApiKeyRepository(env.DB);
+
     return handleRuntimeRequest(
       request,
       repository,
@@ -48,7 +55,8 @@ export default {
       },
       eventRepository,
       ownershipRepository,
-      capabilityRepository
+      capabilityRepository,
+      developerKeyRepository
     );
   }
 };
