@@ -3,6 +3,10 @@ export {
 } from "./d1-capability-repository.js";
 
 export {
+  D1DeveloperApiKeyRepository
+} from "./d1-developer-key-repository.js";
+
+export {
   D1EventRepository
 } from "./d1-event-repository.js";
 
@@ -25,6 +29,23 @@ export {
 export {
   handleCapabilityRequest
 } from "./capability-http.js";
+
+export {
+  handleDeveloperPlatformRequest
+} from "./developer-http.js";
+
+export {
+  authenticateDeveloperApiKey,
+  createDeveloperApiKey,
+  hashDeveloperApiKey,
+  parseDeveloperApiKey,
+  publicDeveloperApiKey,
+  validateDeveloperKeyInput
+} from "./developer-service.js";
+
+export {
+  DEVELOPER_SCOPES
+} from "./developer-types.js";
 
 export {
   buildNewEvent
@@ -50,6 +71,10 @@ export {
 export {
   MemoryCapabilityRepository
 } from "./memory-capability-repository.js";
+
+export {
+  MemoryDeveloperApiKeyRepository
+} from "./memory-developer-key-repository.js";
 
 export {
   MemoryEventRepository
@@ -81,6 +106,15 @@ export type {
   CapabilityResolutionStatus,
   ResolvedObjectCapability
 } from "./capability-types.js";
+
+export type {
+  CreateDeveloperApiKeyInput,
+  DeveloperApiKey,
+  DeveloperApiKeyRecord,
+  DeveloperApiKeyRepository,
+  DeveloperApiKeySecret,
+  DeveloperScope
+} from "./developer-types.js";
 
 export type {
   AssignOwnershipInput,

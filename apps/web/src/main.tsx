@@ -8,6 +8,8 @@ import {
 import App from "./App";
 import CapabilityEngineConsole
   from "./CapabilityEngineConsole";
+import DeveloperConsole
+  from "./DeveloperConsole";
 import ObjectMemoryConsole
   from "./ObjectMemoryConsole";
 import OwnershipAcceptancePage
@@ -23,6 +25,7 @@ import "./physical-object.css";
 import "./object-memory.css";
 import "./ownership.css";
 import "./capability-engine.css";
+import "./developer-platform.css";
 
 const root =
   document.getElementById("root");
@@ -59,6 +62,7 @@ const content = isOwnershipAcceptance
           <ObjectMemoryConsole />
           <OwnershipConsole />
           <CapabilityEngineConsole />
+          <DeveloperConsole />
           <PhysicalBridgeLauncher />
         </>
       );

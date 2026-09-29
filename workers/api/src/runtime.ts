@@ -8,6 +8,10 @@ import {
 } from "./capability-service.js";
 
 import {
+  handleDeveloperPlatformRequest
+} from "./developer-http.js";
+
+import {
   handleRequest
 } from "./http.js";
 
@@ -22,6 +26,10 @@ import {
 import type {
   CapabilityRepository
 } from "./capability-types.js";
+
+import type {
+  DeveloperApiKeyRepository
+} from "./developer-types.js";
 
 import type {
   EventRepository,
@@ -97,9 +105,25 @@ export async function handleRuntimeRequest(
   options: RequestRuntimeOptions = {},
   events?: EventRepository,
   ownership?: OwnershipRepository,
-  capabilities?: CapabilityRepository
+  capabilities?: CapabilityRepository,
+  developerKeys?: DeveloperApiKeyRepository
 ): Promise<Response> {
   if (capabilities) {
+    if (developerKeys) {
+      const developerResponse =
+        await handleDeveloperPlatformRequest(
+          request,
+          objects,
+          capabilities,
+          developerKeys,
+          options
+        );
+
+      if (developerResponse) {
+        return developerResponse;
+      }
+    }
+
     const manifestResponse =
       await handleManifestRequest(
         request,

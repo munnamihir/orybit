@@ -13,7 +13,8 @@
       "/health",
       "/v1/*",
       "/public/*",
-      "/manifest/*"
+      "/manifest/*",
+      "/developer/*"
     ]
   },
   "secrets": {
