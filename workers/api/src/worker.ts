@@ -1,4 +1,8 @@
 import {
+  D1CapabilityRepository
+} from "./d1-capability-repository.js";
+
+import {
   D1EventRepository
 } from "./d1-event-repository.js";
 
@@ -11,8 +15,8 @@ import {
 } from "./d1-ownership-repository.js";
 
 import {
-  handleRequest
-} from "./http.js";
+  handleRuntimeRequest
+} from "./runtime.js";
 
 import type {
   Env
@@ -32,7 +36,10 @@ export default {
     const ownershipRepository =
       new D1OwnershipRepository(env.DB);
 
-    return handleRequest(
+    const capabilityRepository =
+      new D1CapabilityRepository(env.DB);
+
+    return handleRuntimeRequest(
       request,
       repository,
       {
@@ -40,7 +47,8 @@ export default {
           env.ORYBIT_ADMIN_TOKEN
       },
       eventRepository,
-      ownershipRepository
+      ownershipRepository,
+      capabilityRepository
     );
   }
 };

@@ -25,6 +25,7 @@ export {
 export type {
   ActorType,
   CapabilityAccess,
+  CapabilityOperation,
   CarrierType,
   EventActor,
   LifecycleStatus,

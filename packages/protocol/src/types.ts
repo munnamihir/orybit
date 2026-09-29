@@ -74,6 +74,11 @@ export type CapabilityAccess =
   | "owner"
   | "authorized";
 
+export type CapabilityOperation =
+  | "read"
+  | "write"
+  | "execute";
+
 export interface OrybitCapability {
   protocolVersion: OrybitProtocolVersion;
   name: string;
@@ -81,6 +86,8 @@ export interface OrybitCapability {
   description: string;
   access: CapabilityAccess;
   requiresApproval?: boolean;
+  category?: string;
+  operation?: CapabilityOperation;
 }
 
 export interface ValidationResult {
