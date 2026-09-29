@@ -34,6 +34,7 @@ Persistent ORYBIT Identity
       +---- Ownership
       +---- Capabilities
       +---- Manifest
+      +---- Developer API
       +---- Permissions
       +---- Actions
       +---- API
@@ -53,6 +54,7 @@ ORYBIT is an attempt to create a common software layer that can answer:
 - How did ownership change over time?
 - What can it do?
 - How can software discover its public contract?
+- Which software integration is calling ORYBIT?
 - Who is allowed to interact with it?
 - How can software interact with it?
 
@@ -106,16 +108,19 @@ Persistent Object Identity
       ↓
 Cloudflare Worker API
       ↓
+Developer API + SDK
+      ↓
 Cloudflare D1
       ├── objects
       ├── object_events
       ├── owners
       ├── ownership_records
       ├── ownership_transfers
-      └── capability_definitions
+      ├── capability_definitions
+      └── developer_api_keys
 ```
 
-The React dashboard, public object page, public ownership-transfer acceptance page, Capability Engine console, manifest endpoint, and API are deployed from the same Cloudflare Worker origin.
+The React dashboard, public object page, public ownership-transfer acceptance page, Capability Engine console, Developer Platform console, manifest endpoint, and APIs are deployed from the same Cloudflare Worker origin.
 
 ## Current Features
 
@@ -183,6 +188,26 @@ Capability access classifications are descriptive hints. They are **not** a repl
 - public object API advertises the manifest with an HTTP `Link` header
 - computed from source registries instead of stored as duplicate state
 
+### Developer Platform
+
+Step 012 introduces a separate application-authentication boundary for software integrations:
+
+- scoped developer API keys
+- `ory_dev_` credential namespace
+- 256-bit random key secrets
+- raw API key shown only once
+- domain-separated, versioned SHA-512 verifier storage
+- per-key revocation
+- last-used timestamps
+- `objects:read`, `manifests:read`, and `capabilities:read` scopes
+- read-only `/developer/v1` API
+- public-safe developer projections
+- dedicated Developer Platform admin console
+- TypeScript SDK under `sdk/`
+- reference integration under `examples/developer-sdk/`
+
+Developer API keys identify software integrations. They do **not** grant ownership, private Object Memory access, or permission to execute physical-object actions. PermissionOS remains a separate future authorization layer.
+
 ## API
 
 Core admin routes include:
@@ -210,6 +235,10 @@ PATCH /v1/capabilities/:name
 GET   /v1/objects/:identifier/capabilities
 PUT   /v1/objects/:identifier/capabilities/:name
 DELETE /v1/objects/:identifier/capabilities/:name
+
+GET   /v1/developer-keys
+POST  /v1/developer-keys
+POST  /v1/developer-keys/:id/revoke
 ```
 
 Public routes include:
@@ -222,6 +251,47 @@ POST  /public/ownership-transfers/preview
 POST  /public/ownership-transfers/accept
 ```
 
+Developer routes use scoped `ory_dev_...` bearer credentials:
+
+```text
+GET /developer/v1/me
+GET /developer/v1/objects/:publicId
+GET /developer/v1/manifests/:publicId
+GET /developer/v1/objects/:publicId/capabilities
+```
+
+## TypeScript SDK
+
+Build and test the SDK:
+
+```bash
+npm run build:sdk
+npm run test:sdk
+```
+
+Example client:
+
+```ts
+import {
+  OrybitClient
+} from "@orybit/sdk";
+
+const orybit = new OrybitClient({
+  baseUrl: process.env.ORYBIT_BASE_URL!,
+  apiKey: process.env.ORYBIT_API_KEY!
+});
+
+const manifest = await orybit.manifests.get(
+  "coffee-demo-001"
+);
+```
+
+A runnable local-source example lives at:
+
+```text
+examples/developer-sdk/read-object.mjs
+```
+
 ## Repository Structure
 
 ```text
@@ -232,11 +302,13 @@ orybit/
 │   └── api/
 ├── packages/
 │   └── protocol/
+├── sdk/
 ├── migrations/
 ├── specs/
 │   └── v0.1/
 ├── examples/
-│   └── coffee-machine/
+│   ├── coffee-machine/
+│   └── developer-sdk/
 ├── docs/
 │   └── adr/
 ├── scripts/
@@ -274,9 +346,9 @@ npm run cf:d1:migrate:remote
 npm run cf:deploy
 ```
 
-Step 011 adds no new D1 migration; the Object Manifest is computed from existing object and capability records.
+Step 012 adds migration `0005_developer_platform.sql` for the developer API-key registry.
 
-Secrets belong in `.dev.vars` locally and Cloudflare Worker secrets remotely. Never commit `ORYBIT_ADMIN_TOKEN` or ownership-transfer secrets.
+Secrets belong in `.dev.vars` locally or secure environment variables at runtime. Never commit `ORYBIT_ADMIN_TOKEN`, ownership-transfer secrets, or raw developer API keys.
 
 ## Project Status
 
@@ -293,7 +365,8 @@ QR Physical Bridge            ✓
 Object Memory                 ✓
 Ownership                     ✓
 Capability Engine             ✓
-Object Manifest               IN PROGRESS
+Object Manifest               ✓
+Developer Platform            IN PROGRESS
 ```
 
 See:
@@ -303,6 +376,7 @@ See:
 - [`docs/OWNERSHIP.md`](docs/OWNERSHIP.md)
 - [`docs/CAPABILITY-ENGINE.md`](docs/CAPABILITY-ENGINE.md)
 - [`docs/OBJECT-MANIFEST.md`](docs/OBJECT-MANIFEST.md)
+- [`docs/DEVELOPER-PLATFORM.md`](docs/DEVELOPER-PLATFORM.md)
 - [`docs/adr/`](docs/adr/)
 
 ## Direction
@@ -318,7 +392,7 @@ Capability Engine
    ↓
 Object Manifest
    ↓
-Developer API
+Developer Platform
    ↓
 PermissionOS
    ↓
