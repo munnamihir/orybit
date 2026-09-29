@@ -102,9 +102,9 @@ Built:
 
 The Capability Engine describes **what an object can do**. PermissionOS will later decide **who may invoke those capabilities and under which policy**.
 
-## Phase 7 — Object Manifest — IN PROGRESS
+## Phase 7 — Object Manifest — COMPLETE
 
-Step 011 builds:
+Built:
 
 - public machine-readable object manifest
 - `GET /manifest/:publicId`
@@ -121,15 +121,36 @@ Step 011 builds:
 
 The Object Manifest answers **how software can discover the public contract of a physical object in one document**.
 
-## Phase 8 — Developer Platform
+## Phase 8 — Developer Platform — IN PROGRESS
 
-Build:
+Step 012 builds:
 
-- REST API
-- SDK
-- API authentication
-- developer documentation
-- example integrations
+- developer API key registry
+- separate developer authentication from admin authentication
+- 256-bit one-time API key secrets
+- domain-separated SHA-512 key verifiers
+- scoped, revocable credentials
+- last-use tracking
+- `objects:read`, `manifests:read`, and `capabilities:read` scopes
+- read-only `/developer/v1` API
+- public-safe developer projections
+- Developer Platform admin console
+- TypeScript SDK
+- structured SDK errors
+- reference SDK integration
+- regression tests for scopes, privacy, revocation, and admin separation
+
+Developer authentication answers **which software integration is calling ORYBIT**. It does not answer **whether that integration is authorized to execute a physical-object action**; that remains the job of PermissionOS.
+
+Future Developer Platform work may include:
+
+- application identities and organizations
+- key rotation workflows
+- rate limiting
+- usage and audit telemetry
+- webhooks
+- additional SDKs
+- API version lifecycle policies
 
 ## Phase 9 — PermissionOS
 
