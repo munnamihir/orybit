@@ -1,10 +1,13 @@
 import type {
   AssignOwnershipInput,
   CapabilityDefinitionInput,
+  CreateDeveloperApiKeyInput,
   CreateEventInput,
   CreateObjectInput,
   CreateOwnerInput,
   CreateOwnershipTransferInput,
+  DeveloperApiKey,
+  DeveloperApiKeySecret,
   HealthResponse,
   OrybitCapability,
   OrybitEvent,
@@ -404,6 +407,46 @@ export class OrybitApi {
         },
         false
       );
+
+    return response.data;
+  }
+
+  async listDeveloperApiKeys():
+  Promise<DeveloperApiKey[]> {
+    const response = await this.request<
+      ApiListEnvelope<DeveloperApiKey>
+    >("/v1/developer-keys");
+
+    return response.data;
+  }
+
+  async createDeveloperApiKey(
+    input: CreateDeveloperApiKeyInput
+  ): Promise<DeveloperApiKeySecret> {
+    const response = await this.request<
+      ApiEnvelope<DeveloperApiKeySecret>
+    >(
+      "/v1/developer-keys",
+      {
+        method: "POST",
+        body: JSON.stringify(input)
+      }
+    );
+
+    return response.data;
+  }
+
+  async revokeDeveloperApiKey(
+    id: string
+  ): Promise<DeveloperApiKey> {
+    const response = await this.request<
+      ApiEnvelope<DeveloperApiKey>
+    >(
+      `/v1/developer-keys/${encodeURIComponent(
+        id
+      )}/revoke`,
+      { method: "POST" }
+    );
 
     return response.data;
   }
