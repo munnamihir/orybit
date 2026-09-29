@@ -1,14 +1,20 @@
 import type {
+  CapabilityAccess,
+  CapabilityOperation,
   EventActor,
   LifecycleStatus,
   ObjectCarrier,
   ObjectIdentity,
+  OrybitCapability,
   OrybitEvent,
   OrybitObject
 } from "@orybit/protocol";
 
 export type {
+  CapabilityAccess,
+  CapabilityOperation,
   LifecycleStatus,
+  OrybitCapability,
   OrybitEvent,
   OrybitObject
 };
@@ -44,6 +50,23 @@ export interface CreateEventInput {
   occurredAt?: string;
   actor?: EventActor;
   data?: Record<string, unknown>;
+}
+
+export interface CapabilityDefinitionInput {
+  name: string;
+  title: string;
+  description: string;
+  access: CapabilityAccess;
+  requiresApproval?: boolean;
+  category?: string;
+  operation?: CapabilityOperation;
+}
+
+export interface ResolvedObjectCapability {
+  name: string;
+  enabled: true;
+  status: "defined" | "unresolved";
+  definition?: OrybitCapability;
 }
 
 export type OwnerType =
