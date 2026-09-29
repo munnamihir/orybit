@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://orybit.dev/specs/v0.1/manifest.schema.json",
+  "title": "ORYBIT Object Manifest",
+  "description": "Public machine-readable contract for an ORYBIT physical object.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "manifestVersion",
+    "protocolVersion",
+    "object",
+    "capabilities",
+    "links"
+  ],
+  "properties": {
+    "manifestVersion": {
+      "const": "0.1"
+    },
+    "protocolVersion": {
+      "const": "0.1"
+    },
+    "object": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "publicId",
+        "kind",
+        "identity",
+        "lifecycle"
+      ],
+      "properties": {
+        "publicId": {
+          "type": "string",
+          "minLength": 6,
+          "maxLength": 128
+        },
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name"],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "manufacturer": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
+        "lifecycle": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "updatedAt"],
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "active",
+                "inactive",
+                "lost",
+                "retired"
+              ]
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "https://orybit.dev/specs/v0.1/capability.schema.json"
+          },
+          {
+            "properties": {
+              "access": {
+                "const": "public"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "self",
+        "profile",
+        "publicApi",
+        "schema"
+      ],
+      "properties": {
+        "self": {
+          "type": "string",
+          "format": "uri"
+        },
+        "profile": {
+          "type": "string",
+          "format": "uri"
+        },
+        "publicApi": {
+          "type": "string",
+          "format": "uri"
+        },
+        "schema": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

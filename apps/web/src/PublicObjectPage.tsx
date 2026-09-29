@@ -18,6 +18,10 @@ function statusLabel(
     status.slice(1);
 }
 
+function manifestHref(publicId: string): string {
+  return `/manifest/${encodeURIComponent(publicId)}`;
+}
+
 export default function PublicObjectPage({
   publicId
 }: {
@@ -125,6 +129,14 @@ export default function PublicObjectPage({
             {object.identity.description}
           </p>
         )}
+
+        <a
+          className="public-manifest-link"
+          href={manifestHref(object.publicId)}
+        >
+          View machine-readable manifest
+          <span aria-hidden="true">↗</span>
+        </a>
       </section>
 
       <section className="public-object-grid">
@@ -192,8 +204,9 @@ export default function PublicObjectPage({
           </h2>
           <p>
             Internal database IDs, serial numbers,
-            metadata, and administrator credentials
-            are intentionally excluded.
+            metadata, ownership records, private memory,
+            and administrator credentials are intentionally
+            excluded from both this page and its manifest.
           </p>
         </div>
       </section>

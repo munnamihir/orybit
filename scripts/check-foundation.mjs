@@ -17,14 +17,17 @@ const requiredFiles = [
   "specs/v0.1/object.schema.json",
   "specs/v0.1/event.schema.json",
   "specs/v0.1/capability.schema.json",
+  "specs/v0.1/manifest.schema.json",
   "examples/coffee-machine/object.json",
   "examples/coffee-machine/events.json",
   "examples/coffee-machine/capabilities.json",
+  "examples/coffee-machine/manifest.json",
   "packages/protocol/package.json",
   "packages/protocol/tsconfig.json",
   "packages/protocol/src/protocol-version.ts",
   "packages/protocol/src/types.ts",
   "packages/protocol/src/ids.ts",
+  "packages/protocol/src/manifest.ts",
   "packages/protocol/src/validators.ts",
   "packages/protocol/src/index.ts",
   "packages/protocol/test/protocol.test.mjs"
@@ -80,6 +83,13 @@ const object = JSON.parse(
   )
 );
 
+const manifest = JSON.parse(
+  readFileSync(
+    "examples/coffee-machine/manifest.json",
+    "utf8"
+  )
+);
+
 console.log("");
 console.log("Object model validation");
 console.log("-----------------------");
@@ -129,6 +139,33 @@ check(
   Array.isArray(object.capabilities) &&
     object.capabilities.length > 0,
   "Object exposes capabilities"
+);
+
+console.log("");
+console.log("Manifest model validation");
+console.log("-------------------------");
+
+check(
+  manifest.manifestVersion === "0.1",
+  "Manifest version is 0.1"
+);
+
+check(
+  manifest.object?.publicId === object.publicId,
+  "Manifest references the public object identity"
+);
+
+check(
+  Array.isArray(manifest.capabilities) &&
+    manifest.capabilities.every(
+      (capability) => capability.access === "public"
+    ),
+  "Reference manifest exposes only public capabilities"
+);
+
+check(
+  Boolean(manifest.links?.self),
+  "Manifest publishes discovery links"
 );
 
 console.log("");

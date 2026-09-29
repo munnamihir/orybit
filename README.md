@@ -33,6 +33,7 @@ Persistent ORYBIT Identity
       +---- Memory
       +---- Ownership
       +---- Capabilities
+      +---- Manifest
       +---- Permissions
       +---- Actions
       +---- API
@@ -51,6 +52,7 @@ ORYBIT is an attempt to create a common software layer that can answer:
 - Who currently controls it?
 - How did ownership change over time?
 - What can it do?
+- How can software discover its public contract?
 - Who is allowed to interact with it?
 - How can software interact with it?
 
@@ -83,6 +85,10 @@ Something that happened during the object's lifecycle.
 
 A structured definition of an ability exposed by an ORYBIT object. Objects continue to reference capability names so protocol v0.1 remains compact and backward compatible.
 
+### Object Manifest
+
+A public machine-readable contract that combines public-safe object identity, lifecycle state, structured public capabilities, and canonical discovery links in one document.
+
 Ownership is implemented as a runtime domain layered on top of persistent object identity and append-only lifecycle events. It is intentionally separate from the object identity itself.
 
 ## Current Architecture
@@ -93,6 +99,8 @@ Physical Object
 QR / future NFC
       ↓
 Public ORYBIT Profile
+      ↓
+Object Manifest
       ↓
 Persistent Object Identity
       ↓
@@ -107,7 +115,7 @@ Cloudflare D1
       └── capability_definitions
 ```
 
-The React dashboard, public object page, public ownership-transfer acceptance page, Capability Engine console, and API are deployed from the same Cloudflare Worker origin.
+The React dashboard, public object page, public ownership-transfer acceptance page, Capability Engine console, manifest endpoint, and API are deployed from the same Cloudflare Worker origin.
 
 ## Current Features
 
@@ -160,7 +168,20 @@ The React dashboard, public object page, public ownership-transfer acceptance pa
 - public profiles expose only capabilities whose definitions are marked public
 - dedicated Capability Engine admin console
 
-Capability access classifications are descriptive hints in Step 010. They are **not** a replacement for PermissionOS authorization.
+Capability access classifications are descriptive hints. They are **not** a replacement for PermissionOS authorization.
+
+### Object Manifest
+
+- public machine-readable object contract
+- `GET /manifest/:publicId`
+- public-safe identity only
+- structured public capability definitions
+- canonical manifest/profile/API/schema links
+- JSON Schema and executable runtime validation
+- public-ID-only resolution
+- human profile links to the manifest
+- public object API advertises the manifest with an HTTP `Link` header
+- computed from source registries instead of stored as duplicate state
 
 ## API
 
@@ -196,6 +217,7 @@ Public routes include:
 ```text
 GET   /health
 GET   /public/objects/:publicId
+GET   /manifest/:publicId
 POST  /public/ownership-transfers/preview
 POST  /public/ownership-transfers/accept
 ```
@@ -252,6 +274,8 @@ npm run cf:d1:migrate:remote
 npm run cf:deploy
 ```
 
+Step 011 adds no new D1 migration; the Object Manifest is computed from existing object and capability records.
+
 Secrets belong in `.dev.vars` locally and Cloudflare Worker secrets remotely. Never commit `ORYBIT_ADMIN_TOKEN` or ownership-transfer secrets.
 
 ## Project Status
@@ -268,7 +292,8 @@ Public Object Profile         ✓
 QR Physical Bridge            ✓
 Object Memory                 ✓
 Ownership                     ✓
-Capability Engine             IN PROGRESS
+Capability Engine             ✓
+Object Manifest               IN PROGRESS
 ```
 
 See:
@@ -277,6 +302,7 @@ See:
 - [`docs/OBJECT-MEMORY.md`](docs/OBJECT-MEMORY.md)
 - [`docs/OWNERSHIP.md`](docs/OWNERSHIP.md)
 - [`docs/CAPABILITY-ENGINE.md`](docs/CAPABILITY-ENGINE.md)
+- [`docs/OBJECT-MANIFEST.md`](docs/OBJECT-MANIFEST.md)
 - [`docs/adr/`](docs/adr/)
 
 ## Direction

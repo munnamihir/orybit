@@ -12,6 +12,10 @@ import {
 } from "./http.js";
 
 import {
+  handleManifestRequest
+} from "./manifest-http.js";
+
+import {
   toPublicObjectProfile
 } from "./public-object.js";
 
@@ -28,7 +32,8 @@ import type {
 
 function json(
   body: unknown,
-  status = 200
+  status = 200,
+  headers: HeadersInit = {}
 ): Response {
   return new Response(
     JSON.stringify(body, null, 2),
@@ -37,7 +42,8 @@ function json(
       headers: {
         "content-type":
           "application/json; charset=utf-8",
-        "cache-control": "no-store"
+        "cache-control": "no-store",
+        ...headers
       }
     }
   );
@@ -94,6 +100,17 @@ export async function handleRuntimeRequest(
   capabilities?: CapabilityRepository
 ): Promise<Response> {
   if (capabilities) {
+    const manifestResponse =
+      await handleManifestRequest(
+        request,
+        objects,
+        capabilities
+      );
+
+    if (manifestResponse) {
+      return manifestResponse;
+    }
+
     const capabilityResponse =
       await handleCapabilityRequest(
         request,
@@ -127,12 +144,26 @@ export async function handleRuntimeRequest(
             capabilities
           );
 
-        return json({
-          data: toPublicObjectProfile({
-            ...object,
-            capabilities: visibleCapabilities
-          })
-        });
+        const encodedId =
+          encodeURIComponent(object.publicId);
+        const manifestUrl = new URL(
+          `/manifest/${encodedId}`,
+          url.origin
+        ).toString();
+
+        return json(
+          {
+            data: toPublicObjectProfile({
+              ...object,
+              capabilities: visibleCapabilities
+            })
+          },
+          200,
+          {
+            link:
+              `<${manifestUrl}>; rel="describedby"; type="application/json"`
+          }
+        );
       }
     }
 

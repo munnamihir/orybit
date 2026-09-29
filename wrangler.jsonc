@@ -12,7 +12,8 @@
     "run_worker_first": [
       "/health",
       "/v1/*",
-      "/public/*"
+      "/public/*",
+      "/manifest/*"
     ]
   },
   "secrets": {

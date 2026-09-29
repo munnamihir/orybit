@@ -12,6 +12,7 @@ import {
   isObjectId,
   validateOrybitCapability,
   validateOrybitEvent,
+  validateOrybitManifest,
   validateOrybitObject
 } from "../dist/index.js";
 
@@ -111,6 +112,45 @@ test(
         }
       );
     }
+  }
+);
+
+test(
+  "validates the reference public manifest",
+  async () => {
+    const manifest = await readJson(
+      "../../../examples/coffee-machine/manifest.json"
+    );
+
+    assert.deepEqual(
+      validateOrybitManifest(manifest),
+      {
+        valid: true,
+        errors: []
+      }
+    );
+  }
+);
+
+test(
+  "rejects private capabilities in a public manifest",
+  async () => {
+    const manifest = await readJson(
+      "../../../examples/coffee-machine/manifest.json"
+    );
+
+    manifest.capabilities[0].access = "owner";
+
+    const validation =
+      validateOrybitManifest(manifest);
+
+    assert.equal(validation.valid, false);
+    assert.ok(
+      validation.errors.some(
+        (message) =>
+          message.includes("must be public")
+      )
+    );
   }
 );
 

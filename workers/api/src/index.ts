@@ -35,6 +35,15 @@ export {
 } from "./http.js";
 
 export {
+  handleManifestRequest
+} from "./manifest-http.js";
+
+export {
+  buildPublicObjectManifest,
+  MANIFEST_SCHEMA_URL
+} from "./object-manifest.js";
+
+export {
   handleRuntimeRequest
 } from "./runtime.js";
 
