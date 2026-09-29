@@ -83,9 +83,9 @@ Future ownership work may include:
 - ML-DSA signed transfer records
 - ML-KEM recipient-bound handoff
 
-## Phase 6 — Capability Engine — IN PROGRESS
+## Phase 6 — Capability Engine — COMPLETE
 
-Step 010 builds:
+Built:
 
 - persistent capability definition registry
 - structured capability metadata
@@ -102,14 +102,24 @@ Step 010 builds:
 
 The Capability Engine describes **what an object can do**. PermissionOS will later decide **who may invoke those capabilities and under which policy**.
 
-## Phase 7 — Object Manifest
+## Phase 7 — Object Manifest — IN PROGRESS
 
-Publish:
+Step 011 builds:
 
-- machine-readable object manifest
-- JSON Schema
-- protocol specification
-- reference examples
+- public machine-readable object manifest
+- `GET /manifest/:publicId`
+- manifest JSON Schema
+- executable manifest TypeScript model and validator
+- public-safe identity projection
+- structured public capability definitions
+- canonical profile/API/schema links
+- HTTP discovery links
+- human-readable profile link to manifest
+- public-ID-only resolution
+- reference coffee-machine manifest
+- no duplicate D1 manifest storage
+
+The Object Manifest answers **how software can discover the public contract of a physical object in one document**.
 
 ## Phase 8 — Developer Platform
 
