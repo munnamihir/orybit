@@ -215,7 +215,9 @@ export function validateOrybitManifest(
     );
   }
 
-  if (!isRecord(input.links)) {
+  const links = input.links;
+
+  if (!isRecord(links)) {
     errors.push("links must be an object.");
   } else {
     [
@@ -224,7 +226,7 @@ export function validateOrybitManifest(
       "publicApi",
       "schema"
     ].forEach((key) => {
-      if (!isHttpUri(input.links[key])) {
+      if (!isHttpUri(links[key])) {
         errors.push(
           `links.${key} must be an HTTP(S) URI.`
         );
