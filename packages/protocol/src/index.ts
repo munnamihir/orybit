@@ -14,6 +14,20 @@ export {
 } from "./ids.js";
 
 export {
+  assertOrybitManifest,
+  validateOrybitManifest
+} from "./manifest.js";
+
+export type {
+  OrybitManifest,
+  OrybitManifestCapability,
+  OrybitManifestIdentity,
+  OrybitManifestLinks,
+  OrybitManifestObject,
+  OrybitManifestVersion
+} from "./manifest.js";
+
+export {
   assertOrybitCapability,
   assertOrybitEvent,
   assertOrybitObject,
